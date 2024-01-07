@@ -1,6 +1,6 @@
 #!/bin/bash
 
-hciconfig hci0 up
+#hciconfig hci0 up
 
 get_data_for_mac="/app/mitemp/get_data.py"
 mqtt_pub="mosquitto_pub -u ${MQTT_USER} -P ${MQTT_PASSWORD} -p ${MQTT_PORT} -h ${MQTT_HOST} -l -t"
@@ -23,4 +23,4 @@ for sensor_name in "${!sensor_array[@]}"; do
     echo "$data" | $mqtt_pub "mijia/${sensor_name}"
 done
 
-hciconfig hci0 down
+#hciconfig hci0 down
