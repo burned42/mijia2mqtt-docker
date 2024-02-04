@@ -25,6 +25,6 @@ ADD mijia2mqtt.sh /app
 RUN chmod a+x mijia2mqtt.sh mitemp/get_data.py
 
 RUN mkdir -p /var/spool/cron/crontabs \
-    && echo '* * * * * timeout 55 /app/mijia2mqtt.sh' > /var/spool/cron/crontabs/root
+    && echo '*/2 * * * * timeout 55 /app/mijia2mqtt.sh' > /var/spool/cron/crontabs/root
 
 ENTRYPOINT busybox crond -f -l 0 -L /dev/stdout
