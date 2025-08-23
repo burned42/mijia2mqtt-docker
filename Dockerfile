@@ -6,6 +6,8 @@ ENV MQTT_USER="changeme" \
     MQTT_HOST="localhost"
 # space separated list of "<sensor1_name> <sensor1_mac> <sensor2_name> <sensor2_mac> ..."
 ENV SENSORS="test 01:23:45:67:89:01"
+# URL to call after every cron job run
+ENV PUSH_URL=""
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends bluez mosquitto-clients busybox-static \
