@@ -24,3 +24,7 @@ for sensor_name in "${!sensor_array[@]}"; do
 done
 
 hciconfig hci0 down
+
+if [[ ! -z "$PUSH_URL" ]]; then
+    curl -s -o /dev/null "$PUSH_URL"
+fi
