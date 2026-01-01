@@ -1,9 +1,6 @@
 #!/bin/bash
 
-hciconfig hci0 up
-
-get_data_for_mac="/app/mitemp/get_data.py"
-mqtt_pub="mosquitto_pub -u ${MQTT_USER} -P ${MQTT_PASSWORD} -p ${MQTT_PORT} -h ${MQTT_HOST} -l -t"
+hciconfig hci0 up || exit 1
 
 declare -A sensor_array
 sensor_name=false
@@ -16,15 +13,22 @@ for data in ${SENSORS}; do
     fi
 done
 
+all_ok=true
 for sensor_name in "${!sensor_array[@]}"; do
     sensor_mac="${sensor_array[$sensor_name]}"
-    data="$(${get_data_for_mac} "${sensor_mac}")"
+    data="$(timeout 10 /app/mitemp/get_data.py "${sensor_mac}")"
+    ret=$?
 
-    echo "$data" | $mqtt_pub "mijia/${sensor_name}"
+    if [[ $ret -ne 0 || -z "$data" ]]; then
+        all_ok=false
+        continue
+    fi
+
+    mosquitto_pub -u ${MQTT_USER} -P ${MQTT_PASSWORD} -p ${MQTT_PORT} -h ${MQTT_HOST} -q 1 -t "mijia/${sensor_name}" -m "$data"
 done
 
 hciconfig hci0 down
 
-if [[ ! -z "$PUSH_URL" ]]; then
+if [[ "$all_ok" == true && ! -z "$PUSH_URL" ]]; then
     curl -s -o /dev/null "$PUSH_URL"
 fi
